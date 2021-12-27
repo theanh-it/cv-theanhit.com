@@ -3,7 +3,8 @@ var app     = express();
 var routes  = require("./app");
 var {Server}= require("socket.io");
 
-var http    = app.listen(4000, ()=>console.log("Server runing: http://localhost:4000"));
+var {port}  = require("./config.json");
+var http    = app.listen(port, ()=>console.log("Server runing: http://localhost:"+port));
 var io      = new Server(http);
 var socket  = require("./socket");
 
