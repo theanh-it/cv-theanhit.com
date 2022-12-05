@@ -74,6 +74,7 @@ header .container .box-header .avata .image img{
     height: 100%;
     border-radius: 100%;
     border: 2px solid transparent;
+    object-fit: cover;
 }
 header .container .box-header .avata .image a{
     display: inline-block;
