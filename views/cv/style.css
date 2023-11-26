@@ -155,8 +155,8 @@ main.container .box-main .right .graduate h2 .text{
 main.container .box-main .right .graduate .box-graduate{
     margin-top: 15px;
 }
-main.container .box-main .right .graduate .box-graduate .item{
-    
+main.container .box-main .right .graduate .box-graduate .item .company{
+
 }
 main.container .box-main .right .graduate .box-graduate .item h3{
     color: #3F4650;
@@ -174,6 +174,11 @@ main.container .box-main .right .graduate .box-graduate .item ul{
 main.container .box-main .right .experience{
     width: 100%;
     margin-top: 10px;
+}
+main.container .box-main .right .experience .box-experience .item .company{
+    background: #f3f3f3;
+    padding: 15px;
+    border-radius: 5px;
 }
 main.container .box-main .right .experience h2{
     display: flex;
@@ -249,6 +254,11 @@ main.container .box-main .right .project .box-project ul li a{
     color: #3F4650;
     font-weight: 600;
 }
+
+table tr td:first-child{
+    width: 200px;
+}
+
 @media (max-width:740px) {
     main{
         padding: 15px;
