@@ -33,9 +33,86 @@
       referrerpolicy="no-referrer"
     />
     <link rel="stylesheet" href="style.css" />
+    <style>
+      .loading {
+        position: fixed;
+        top: 0;
+        left: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+        width: 100vw;
+        background-color: #fff;
+        z-index: 9999;
+      }
+      .loader {
+        width: 48px;
+        height: 48px;
+        border-radius: 50%;
+        display: inline-block;
+        position: relative;
+        border: 3px solid;
+        border-color: #ff3d00 #ff3d00 transparent;
+        box-sizing: border-box;
+        animation: rotation 1s linear infinite;
+      }
+      .loader::after {
+        content: "";
+        box-sizing: border-box;
+        position: absolute;
+        left: 0;
+        right: 0;
+        top: 0;
+        bottom: 0;
+        margin: auto;
+        border: 3px solid;
+        border-color: transparent #ff3d00 #ff3d00;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        animation: rotationBack 0.5s linear infinite;
+        transform-origin: center center;
+      }
+
+      @keyframes rotation {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      @keyframes rotationBack {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(-360deg);
+        }
+      }
+    </style>
+    <style>
+      .list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+      .list > .item {
+        background-color: #f0f0f0;
+        padding: 5px 10px;
+        border-radius: 5px;
+        margin: 0px !important;
+        font-weight: 600;
+      }
+    </style>
   </head>
   <body>
     <main id="app" class="container">
+      <div v-if="!isReady" class="loading">
+        <span class="loader"></span>
+      </div>
       <div class="box-main">
         <div class="right">
           <div class="header">
@@ -53,10 +130,6 @@
                   <div class="text phone">
                     <a href="tel:0919419496" title="09.194.194.96"
                       >09.194.194.96</a
-                    >
-                    -
-                    <a title="0962.296.380" href="tel:0962296380"
-                      >0962.296.380</a
                     >
                   </div>
                   <div class="icon">
@@ -158,21 +231,31 @@
                       <template v-if="project[key]">
                         <td>{{ value }}</td>
                         <td v-if="key === 'link'">
-                          <a :href="project[key]" target="_blank">
-                            {{ project[key] }}
-                          </a>
+                          <template v-if="project.type === 'app'">
+                            <a :href="project[key].ios" target="_blank">
+                              Link App IOS
+                            </a>
+                            |
+                            <a :href="project[key].android" target="_blank">
+                              Link App Android
+                            </a>
+                          </template>
+                          <template v-else>
+                            <a :href="project[key]" target="_blank">
+                              {{ project[key] }}
+                            </a>
+                          </template>
                         </td>
-                        <td v-else-if="key !== 'detail'">{{ project[key] }}</td>
-                        <td v-else>
-                          <div v-for="(item, detailKey) in PROJECT_DETAIL">
-                            <h5>{{ item }}:</h5>
-                            <ul>
-                              <li v-for="part in project.detail[detailKey]">
-                                {{ part }}
-                              </li>
-                            </ul>
+                        <td
+                          v-else-if="['backend', 'frontend', 'server'].includes(key)"
+                        >
+                          <div class="list">
+                            <div class="item" v-for="item in project[key]">
+                              {{ item }}
+                            </div>
                           </div>
                         </td>
+                        <td v-else>{{ project[key] }}</td>
                       </template>
                     </tr>
                   </table>
@@ -358,17 +441,169 @@
         link: "Link",
         teamSize: "Team size",
         position: "Vị trí",
-        detail: "Chi tiết",
+        backend: "Backend",
+        frontend: "Frontend",
+        server: "Server",
       };
       const PROJECT_DETAIL = {
         backend: "Backend",
         frontend: "Frontend",
         server: "Server",
       };
+      const ztech = {
+        position: "Full-Stack Developer",
+        companyName: "ZTech",
+        time: "09/2024 - nay",
+        projects: [
+          {
+            type: "app",
+            name: "DMV Practice Test Pro ",
+            description: "Ứng dụng thi bằng lái xe",
+            link: {
+              ios: "https://apps.apple.com/vn/app/dmv-practice-test-pro-2024/id6505030053?l=vi",
+              android:
+                "https://play.google.com/store/apps/details?id=io.zwork.dmvtest&pli=1",
+            },
+            teamSize: "1",
+            position: "Fullstack",
+            backend: [
+              "RESTfull API",
+              "Typescript",
+              "Nodejs",
+              "Express",
+              "Mysql",
+              "Prisma",
+              "Prisma:seed",
+              "Zod",
+            ],
+            frontend: [
+              "Ionic 7",
+              "Typescript",
+              "Vue3",
+              "Vuetify",
+              "Date-fns",
+              "Capacitor",
+              "@capacitor-community/admob",
+              "@capacitor-community/sqlite",
+              "Axios",
+              "Prisma",
+            ],
+            server: ["VPS", "UBUNTU 22.04", "MYSQL 8.0", "NGINX", "PM2"],
+          },
+          {
+            type: "web",
+            name: "UPSEO",
+            description: "Bán các sản phẩm SEO",
+            link: "https://upseo.co",
+            teamSize: "1",
+            position: "Fullstack",
+
+            backend: [
+              "RESTfull API",
+              "Typescript",
+              "Nodejs",
+              "Express",
+              "Mysql",
+              "Prisma",
+              "Prisma:seed",
+              "Zod",
+              "Socket.io server",
+            ],
+            frontend: [
+              "Typescript",
+              "Axios",
+              "Nuxt3",
+              "Primevue",
+              "Date-fns",
+              "Vuelidate",
+              "Socket.io client",
+            ],
+            server: ["VPS", "UBUNTU 22.04", "MYSQL 8.0", "NGINX", "PM2"],
+          },
+          {
+            name: "Xổ số",
+            description: "Web xem kết quả xổ số, thống kê kết quả. dò xổ số",
+            link: "http://209.97.167.125:3001/",
+            teamSize: "1",
+            position: "Fullstack",
+
+            backend: [
+              "RESTfull API",
+              "Typescript",
+              "Nodejs",
+              "Express",
+              "Mysql",
+              "Prisma",
+              "Date-fns",
+            ],
+            frontend: ["Typescript", "Axios", "Nuxt3", "Primevue", "Date-fns"],
+            server: ["VPS", "UBUNTU 22.04", "MYSQL 8.0", "NGINX", "PM2"],
+          },
+          {
+            name: "trumtuongtac.to",
+            description:
+              "Web tang like comment follow, tạo đại lý n cấp, tự tạo website riêng, tính tiền hoa hồng cho tầng cấp",
+            teamSize: "1",
+            link: "https://trumtuongtac.to",
+            position: "Fullstack",
+
+            backend: [
+              "RESTfull API",
+              "Typescript",
+              "Nodejs",
+              "Express",
+              "Mysql",
+              "Prisma",
+              "Date-fns",
+              "Zod",
+            ],
+            frontend: [
+              "Typescript",
+              "Axios",
+              "Nuxt3",
+              "Primevue",
+              "Date-fns",
+              "Vuelidate",
+            ],
+            server: ["VPS", "UBUNTU 22.04", "MYSQL 8.0", "NGINX", "PM2"],
+          },
+          {
+            name: "ktmarry",
+            description: "Web giới thiệu chụp ảnh, chụp ảnh cưới, quay video",
+            teamSize: "1",
+            link: "http://36.50.176.162:3000/",
+            position: "Fullstack",
+
+            backend: [
+              "RESTfull API",
+              "Typescript",
+              "Nodejs",
+              "Express",
+              "Mysql",
+              "Prisma",
+              "Date-fns",
+              "Zod",
+              "Sharp",
+              "Socket.io server",
+            ],
+            frontend: [
+              "Typescript",
+              "Axios",
+              "Nuxt3",
+              "Primevue",
+              "Date-fns",
+              "Vuelidate",
+              "Socket.io client",
+              "pica",
+            ],
+            server: ["VPS", "UBUNTU 22.04", "MYSQL 8.0", "NGINX", "PM2"],
+          },
+        ],
+      };
       const azoom = {
         position: "Full-Stack Developer",
         companyName: "Azoom Việt Nam Inc.",
-        time: "01/2023 - nay",
+        time: "01/2023 - 08/2024",
         projects: [
           {
             name: "Coconi",
@@ -376,11 +611,9 @@
             link: "https://coconi.work",
             teamSize: "3",
             position: "Fullstack",
-            detail: {
-              backend: ["RESTfull API", "Nodejs", "Mysql", "Firebase"],
-              frontend: ["Nuxt2", "Rsmdc", "Rscss", "Pica", "Event-bus"],
-              server: ["Google clould", "Firebase"],
-            },
+            backend: ["RESTfull API", "Nodejs", "Mysql", "Firebase"],
+            frontend: ["Nuxt2", "Rsmdc", "Rscss", "Pica", "Event-bus"],
+            server: ["Google clould", "Firebase"],
           },
           {
             name: "Ferry",
@@ -388,33 +621,31 @@
             link: "https://ferry.smaku-dev.work",
             teamSize: "8",
             position: "Fullstack",
-            detail: {
-              backend: [
-                "RESTfull API",
-                "Typescript",
-                "Auth0",
-                "Pomerium",
-                "Nodejs",
-                "Express",
-                "Mysql",
-                "Prisma",
-                "Prisma-fabbrica",
-                "Prisma:seed",
-                "Faker.js",
-                "Zod",
-                "Jest",
-              ],
-              frontend: [
-                "Typescript",
-                "Ky",
-                "Nuxt3",
-                "Vuetify",
-                "Date-fns",
-                "Vee-validate",
-                "Zod",
-              ],
-              server: ["Google clould", "Firebase"],
-            },
+            backend: [
+              "RESTfull API",
+              "Typescript",
+              "Auth0",
+              "Pomerium",
+              "Nodejs",
+              "Express",
+              "Mysql",
+              "Prisma",
+              "Prisma-fabbrica",
+              "Prisma:seed",
+              "Faker.js",
+              "Zod",
+              "Jest",
+            ],
+            frontend: [
+              "Typescript",
+              "Ky",
+              "Nuxt3",
+              "Vuetify",
+              "Date-fns",
+              "Vee-validate",
+              "Zod",
+            ],
+            server: ["Google clould", "Firebase"],
           },
           {
             name: "Carparking One",
@@ -422,29 +653,27 @@
             link: "https://staging-one.carparking.jp",
             teamSize: "10",
             position: "Fullstack",
-            detail: {
-              backend: [
-                "RESTfull API",
-                "Auth0",
-                "Pomerium",
-                "Nodejs",
-                "Express",
-                "Mysql",
-                "Prisma",
-                "Date-fns",
-                "Lodash",
-                "Got",
-              ],
-              frontend: [
-                "Ky",
-                "Nuxt2",
-                "Marterial ui",
-                "Date-fns",
-                "Vuelidate",
-                "Lodash",
-              ],
-              server: ["Google clould"],
-            },
+            backend: [
+              "RESTfull API",
+              "Auth0",
+              "Pomerium",
+              "Nodejs",
+              "Express",
+              "Mysql",
+              "Prisma",
+              "Date-fns",
+              "Lodash",
+              "Got",
+            ],
+            frontend: [
+              "Ky",
+              "Nuxt2",
+              "Marterial ui",
+              "Date-fns",
+              "Vuelidate",
+              "Lodash",
+            ],
+            server: ["Google clould"],
           },
           {
             name: "Teppeki",
@@ -452,29 +681,27 @@
             teamSize: "2",
             link: "https://staging.teppeki.cloud",
             position: "Fullstack",
-            detail: {
-              backend: [
-                "RESTfull API",
-                "Auth0",
-                "Pomerium",
-                "Nodejs",
-                "Express",
-                "Mysql",
-                "Prisma",
-                "Date-fns",
-                "Lodash",
-                "Got",
-              ],
-              frontend: [
-                "Ky",
-                "Nuxt2",
-                "Marterial ui",
-                "Date-fns",
-                "Vuelidate",
-                "Lodash",
-              ],
-              server: ["Google clould"],
-            },
+            backend: [
+              "RESTfull API",
+              "Auth0",
+              "Pomerium",
+              "Nodejs",
+              "Express",
+              "Mysql",
+              "Prisma",
+              "Date-fns",
+              "Lodash",
+              "Got",
+            ],
+            frontend: [
+              "Ky",
+              "Nuxt2",
+              "Marterial ui",
+              "Date-fns",
+              "Vuelidate",
+              "Lodash",
+            ],
+            server: ["Google clould"],
           },
         ],
       };
@@ -489,29 +716,27 @@
             link: "https://dev.moso-odontologi.no",
             teamSize: "8",
             position: "Fullstack",
-            detail: {
-              backend: [
-                "RESTfull API",
-                "PHP-LARAVEL",
-                "Mysql",
-                "Nodejs",
-                "Mongodb",
-                "Mongoose",
-                "Socket.io",
-                "Lodash",
-                "Axios",
-                "Moment",
-              ],
-              frontend: ["Nuxt2", "Vuetify", "Axios", "Lodash", "Moment"],
-              server: [
-                "Ubuntu server 20.04",
-                "PHP 7.4",
-                "Nodejs v14",
-                "MYSQL 8",
-                "Apache2",
-                "PM2",
-              ],
-            },
+            backend: [
+              "RESTfull API",
+              "PHP-LARAVEL",
+              "Mysql",
+              "Nodejs",
+              "Mongodb",
+              "Mongoose",
+              "Socket.io",
+              "Lodash",
+              "Axios",
+              "Moment",
+            ],
+            frontend: ["Nuxt2", "Vuetify", "Axios", "Lodash", "Moment"],
+            server: [
+              "Ubuntu server 20.04",
+              "PHP 7.4",
+              "Nodejs v14",
+              "MYSQL 8",
+              "Apache2",
+              "PM2",
+            ],
           },
           {
             name: "MOSO5.0",
@@ -519,29 +744,27 @@
             link: "https://moso.as",
             teamSize: "10",
             position: "Fullstack",
-            detail: {
-              backend: [
-                "RESTfull API",
-                "PHP-LARAVEL",
-                "Mysql",
-                "Nodejs",
-                "Mongodb",
-                "Mongoose",
-                "Socket.io",
-                "Lodash",
-                "Axios",
-                "Moment",
-              ],
-              frontend: ["Nuxt2", "Vuetify", "Axios", "Lodash", "Moment"],
-              server: [
-                "Ubuntu server 20.04",
-                "PHP 7.4",
-                "Nodejs v14",
-                "MYSQL 8",
-                "Apache2",
-                "PM2",
-              ],
-            },
+            backend: [
+              "RESTfull API",
+              "PHP-LARAVEL",
+              "Mysql",
+              "Nodejs",
+              "Mongodb",
+              "Mongoose",
+              "Socket.io",
+              "Lodash",
+              "Axios",
+              "Moment",
+            ],
+            frontend: ["Nuxt2", "Vuetify", "Axios", "Lodash", "Moment"],
+            server: [
+              "Ubuntu server 20.04",
+              "PHP 7.4",
+              "Nodejs v14",
+              "MYSQL 8",
+              "Apache2",
+              "PM2",
+            ],
           },
         ],
       };
@@ -556,37 +779,35 @@
             link: "https://tizi.vn",
             teamSize: "1",
             position: "Fullstack",
-            detail: {
-              backend: [
-                "RESTfull API",
-                "PHP-LARAVEL",
-                "Mysql",
-                "Nodejs",
-                "Mongodb",
-                "Mongoose",
-                "Socket.io",
-                "Lodash",
-                "Axios",
-                "Moment",
-                "Sharp",
-              ],
-              frontend: [
-                "Vue2",
-                "Boostrap",
-                "Font-awesome",
-                "Axios",
-                "Lodash",
-                "Moment",
-              ],
-              server: [
-                "Ubuntu server 16.04",
-                "PHP 7.4",
-                "Nodejs v14",
-                "MYSQL 5.7",
-                "Nginx",
-                "PM2",
-              ],
-            },
+            backend: [
+              "RESTfull API",
+              "PHP-LARAVEL",
+              "Mysql",
+              "Nodejs",
+              "Mongodb",
+              "Mongoose",
+              "Socket.io",
+              "Lodash",
+              "Axios",
+              "Moment",
+              "Sharp",
+            ],
+            frontend: [
+              "Vue2",
+              "Boostrap",
+              "Font-awesome",
+              "Axios",
+              "Lodash",
+              "Moment",
+            ],
+            server: [
+              "Ubuntu server 16.04",
+              "PHP 7.4",
+              "Nodejs v14",
+              "MYSQL 5.7",
+              "Nginx",
+              "PM2",
+            ],
           },
           {
             name: "Đà thành camera",
@@ -594,34 +815,33 @@
             link: "https://dathanhcamera.com",
             teamSize: "1",
             position: "Fullstack",
-            detail: {
-              backend: [
-                "RESTfull API",
-                "PHP-LARAVEL",
-                "Mysql",
-                "Nodejs",
-                "Lodash",
-                "Axios",
-                "Moment",
-                "Sharp",
-              ],
-              frontend: [
-                "Vue2",
-                "Boostrap",
-                "Font-awesome",
-                "Axios",
-                "Lodash",
-                "Moment",
-              ],
-              server: [
-                "Ubuntu server 16.04",
-                "PHP 7.4",
-                "Nodejs v14",
-                "MYSQL 5.7",
-                "Nginx",
-                "PM2",
-              ],
-            },
+
+            backend: [
+              "RESTfull API",
+              "PHP-LARAVEL",
+              "Mysql",
+              "Nodejs",
+              "Lodash",
+              "Axios",
+              "Moment",
+              "Sharp",
+            ],
+            frontend: [
+              "Vue2",
+              "Boostrap",
+              "Font-awesome",
+              "Axios",
+              "Lodash",
+              "Moment",
+            ],
+            server: [
+              "Ubuntu server 16.04",
+              "PHP 7.4",
+              "Nodejs v14",
+              "MYSQL 5.7",
+              "Nginx",
+              "PM2",
+            ],
           },
           {
             name: "Dreambook",
@@ -629,34 +849,33 @@
             link: "https://dreambook.vn",
             teamSize: "1",
             position: "Fullstack",
-            detail: {
-              backend: [
-                "RESTfull API",
-                "MVC",
-                "PHP-LARAVEL",
-                "Mysql",
-                "Nodejs",
-                "Lodash",
-                "Moment",
-              ],
-              frontend: [
-                "Vue2",
-                "JQuery",
-                "Ajax",
-                "Boostrap",
-                "Font-awesome",
-                "Axios",
-                "Moment",
-              ],
-              server: [
-                "Ubuntu server 16.04",
-                "PHP 7.4",
-                "Nodejs v14",
-                "MYSQL 5.7",
-                "Nginx",
-                "PM2",
-              ],
-            },
+
+            backend: [
+              "RESTfull API",
+              "MVC",
+              "PHP-LARAVEL",
+              "Mysql",
+              "Nodejs",
+              "Lodash",
+              "Moment",
+            ],
+            frontend: [
+              "Vue2",
+              "JQuery",
+              "Ajax",
+              "Boostrap",
+              "Font-awesome",
+              "Axios",
+              "Moment",
+            ],
+            server: [
+              "Ubuntu server 16.04",
+              "PHP 7.4",
+              "Nodejs v14",
+              "MYSQL 5.7",
+              "Nginx",
+              "PM2",
+            ],
           },
           {
             name: "Rồng việt express",
@@ -664,11 +883,10 @@
             link: "https://rongvietexpess.vn",
             teamSize: "1",
             position: "Fullstack",
-            detail: {
-              backend: ["RESTfull API", "PHP-LARAVEL", "Mysql"],
-              frontend: ["Vue2", "Font-awesome", "Axios"],
-              server: ["Ubuntu server 16.04", "PHP 7.4", "MYSQL 5.7", "Nginx"],
-            },
+
+            backend: ["RESTfull API", "PHP-LARAVEL", "Mysql"],
+            frontend: ["Vue2", "Font-awesome", "Axios"],
+            server: ["Ubuntu server 16.04", "PHP 7.4", "MYSQL 5.7", "Nginx"],
           },
         ],
       };
@@ -709,11 +927,15 @@
           return {
             fullName: "Nguyễn Thế Anh",
             position: "Web Developer",
-            experience: [azoom, unitech, vnct, vinaenter],
+            experience: [ztech, azoom, unitech, vnct, vinaenter],
+            isReady: false,
           };
         },
         beforeCreate() {
           Object.assign(this, { PROJECT, PROJECT_DETAIL });
+        },
+        mounted() {
+          this.isReady = true;
         },
       });
     </script>
